@@ -81,8 +81,10 @@ class GerencianetPaymentModuleFrontController extends ModuleFrontController
     	$billet_discount = floatval(preg_replace( '/[^0-9.]/', '', str_replace(",",".",Configuration::get('GERENCIANET_DISCOUNT_BILLET_VALUE'))));
     	$billet_discount_formatted = str_replace(".",",",$billet_discount);
 
-    	$total_order_gn_formatted = GerencianetIntegration::priceFormat($cart->getOrderTotal(true));
-    	$total_order_pay_with_billet_gn_formatted = (int) ($total_order_gn_formatted * (1-($billet_discount/100)));
+		$total_order_gn_formatted = GerencianetIntegration::priceFormat($cart->getOrderTotal(true));
+        $total_product_gn_formatted = GerencianetIntegration::priceFormat($cart->getOrderTotal(true,Cart::ONLY_PRODUCTS));
+        $total_shipping_gn_formatted = (int) ($total_order_gn_formatted - $total_product_gn_formatted);
+        $total_order_pay_with_billet_gn_formatted = (int) (($total_product_gn_formatted * (1-($billet_discount/100)))+$total_shipping_gn_formatted);
     	$total_discount = $total_order_gn_formatted - $total_billet_discount_gn_formatted;
 
 		$this->gnIntegration = $this->configGerencianetIntegration();
